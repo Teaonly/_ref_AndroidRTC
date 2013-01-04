@@ -1,0 +1,1 @@
+/home/frank/xproj/ProbICE/android/jni/libjingle_build.mk
