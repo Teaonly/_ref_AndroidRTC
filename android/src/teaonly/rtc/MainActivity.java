@@ -90,7 +90,6 @@ public class MainActivity extends Activity
             videoFrames[i] = new VideoFrame(1024*1024*2);        
         }    
 
-        initAudio();
         initCamera();
     }
     
@@ -131,10 +130,7 @@ public class MainActivity extends Activity
         if ( webServer != null)
             webServer.stop();
         cameraView_.StopPreview(); 
-        //cameraView_.Release();
-        audioLoop.ReleaseLoop();
-        audioCapture.release();
-    
+        
         //System.exit(0);
         finish();
     }  
@@ -240,6 +236,8 @@ public class MainActivity extends Activity
         public String run(Properties parms) {
             String remote = parms.getProperty("remote"); 
             
+            int wid = 640;
+            int hei = 480; 
             cameraView_.StopPreview();
             cameraView_.setupCamera(wid, hei, previewCb_);
             cameraView_.StartPreview();
