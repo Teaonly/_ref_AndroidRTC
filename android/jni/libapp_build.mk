@@ -1,3 +1,4 @@
 LOCAL_SRC_FILES += \
-            main.cpp
+            main.cpp \
+            encoder.cpp
 

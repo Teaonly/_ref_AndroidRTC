@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.lang.System;
 import java.lang.Thread;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.*;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -25,6 +26,7 @@ import android.content.res.AssetFileDescriptor;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.PictureCallback;
+import android.graphics.PixelFormat;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.CompressFormat;
@@ -56,18 +58,16 @@ import android.widget.ImageButton;
 import android.widget.Button;
 import android.widget.TextView;
 
+
 public class MainActivity extends Activity 
     implements View.OnTouchListener, CameraView.CameraReadyCallback, OverlayView.UpdateDoneCallback{
     private static final String TAG = "TEAONLY";
 
-    boolean inProcessing = false;
-    final int maxVideoNumber = 3;
-    VideoFrame[] videoFrames = new VideoFrame[maxVideoNumber];
-    byte[] preFrame = new byte[1024*1024*8];
-    
     TeaServer webServer = null;
     private CameraView cameraView_;
     private OverlayView overlayView_;
+    private ReentrantLock previewLock = new ReentrantLock(); 
+    
     private Button btnExit;
     private TextView tvMessage1;
 
@@ -86,10 +86,6 @@ public class MainActivity extends Activity
         btnExit.setOnClickListener(exitAction);
         tvMessage1 = (TextView)findViewById(R.id.tv_message1);
         
-        for(int i = 0; i < maxVideoNumber; i++) {
-            videoFrames[i] = new VideoFrame(1024*1024*2);        
-        }    
-
         initCamera();
     }
     
@@ -99,7 +95,7 @@ public class MainActivity extends Activity
             int wid = cameraView_.Width();
             int hei = cameraView_.Height();
             cameraView_.StopPreview();
-            cameraView_.setupCamera(wid, hei, previewCb_);
+            cameraView_.setupCamera(wid, hei, 3, previewCb_);
             cameraView_.StartPreview();
         }
     }
@@ -126,11 +122,13 @@ public class MainActivity extends Activity
     @Override
     public void onPause(){  
         super.onPause();
-        inProcessing = true;
         if ( webServer != null)
             webServer.stop();
-        cameraView_.StopPreview(); 
         
+        previewLock.lock();    
+        cameraView_.StopPreview(); 
+        previewLock.unlock();
+
         //System.exit(0);
         finish();
     }  
@@ -206,16 +204,10 @@ public class MainActivity extends Activity
    
     private PreviewCallback previewCb_ = new PreviewCallback() {
         public void onPreviewFrame(byte[] frame, Camera c) {
-            if ( !inProcessing ) {
-                inProcessing = true;
-           
-                int picWidth = cameraView_.Width();
-                int picHeight = cameraView_.Height(); 
-                ByteBuffer bbuffer = ByteBuffer.wrap(frame); 
-                bbuffer.get(preFrame, 0, picWidth*picHeight + picWidth*picHeight/2);
+            previewLock.lock();
 
-                inProcessing = false;
-            }
+            c.addCallbackBuffer(frame);
+            previewLock.unlock();
         }
     };
     
@@ -239,7 +231,7 @@ public class MainActivity extends Activity
             int wid = 640;
             int hei = 480; 
             cameraView_.StopPreview();
-            cameraView_.setupCamera(wid, hei, previewCb_);
+            cameraView_.setupCamera(wid, hei, 3, previewCb_);
             cameraView_.StartPreview();
             
             return "OK";

@@ -1,5 +1,7 @@
 package teaonly.rtc;
 
+import android.graphics.ImageFormat;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.PictureCallback;
@@ -74,15 +76,36 @@ public class CameraView implements SurfaceHolder.Callback{
         }
     }
     
-    public void setupCamera(int wid, int hei, PreviewCallback cb) {
-        procSize_.width = wid;
-        procSize_.height = hei;
+    public void setupCamera(int wid, int hei, int bufNumber, PreviewCallback cb) {
         
+        int diff = Math.abs(supportedSizes.get(0).width - wid);
+        int targetIndex = 0;
+        for(int i = 0; i < supportedSizes.size(); i++) {
+            int newDiff = Math.abs(supportedSizes.get(i).width - wid);
+            if ( newDiff < diff) {
+                diff = newDiff;
+                targetIndex = i;
+            }
+        }
+
+        procSize_.width = supportedSizes.get(targetIndex).width;
+        procSize_.height = supportedSizes.get(targetIndex).height;
+
+        PixelFormat pixelFormat = new PixelFormat();
+        PixelFormat.getPixelFormatInfo(ImageFormat.NV21, pixelFormat);  
+
         Camera.Parameters p = camera_.getParameters();        
         p.setPreviewSize(procSize_.width, procSize_.height);
+        p.setPreviewFormat(ImageFormat.NV21);
         camera_.setParameters(p);
-        
-        camera_.setPreviewCallback(cb);
+
+        int bufSize = procSize_.width * procSize_.height * pixelFormat.bitsPerPixel / 8;
+        byte[] buffer = null;
+        for(int i = 0; i < bufNumber; i++) {
+            buffer = new byte[ bufSize ];
+            camera_.addCallbackBuffer(buffer);
+        }
+        camera_.setPreviewCallbackWithBuffer(cb);
     }
 
     private void setupCamera() {
@@ -101,6 +124,7 @@ public class CameraView implements SurfaceHolder.Callback{
         } catch ( Exception ex) {
             ex.printStackTrace(); 
         }
+        camera_.setPreviewCallbackWithBuffer(null);
         camera_.startPreview();    
     }  
     
