@@ -1,6 +1,7 @@
 #ifndef _MEDIACHANNEL_H_
 #define _MEDIACHANNEL_H_
 
+#include "helper.h"
 #include "talk/base/sigslot.h"
 #include "talk/base/thread.h"
 
@@ -11,9 +12,9 @@ public:
   }
   virtual ~MediaChannel(){};
 
-  virtual bool Connect(const std::string &url) = 0;
+  virtual void Connect(const MediaURL &url) = 0;
   virtual int PushData(const unsigned char * data, size_t len) = 0;
-  virtual bool Close() = 0;
+  virtual int Close() = 0;
   virtual bool IsReady() {
     return is_ready_;
   }

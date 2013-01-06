@@ -10,7 +10,7 @@ extern "C" {
     JNIEXPORT jint JNICALL JNIDEFINE(nativeStart)(JNIEnv* env, jclass clz, jstring remote, jstring description);
     JNIEXPORT jint JNICALL JNIDEFINE(nativeStop)(JNIEnv* env, jclass clz);
 
-    JNIEXPORT jint JNICALL JNIDEFINE(nativePushFrame)(JNIEnv* env, jclass clz, jint wid, jint hei, jbyteArray yuvData);
+    JNIEXPORT jint JNICALL JNIDEFINE(nativePushFrame)(JNIEnv* env, jclass clz, jbyteArray yuvData);
 }
 
 static std::string convert_jstring(JNIEnv *env, const jstring &js) {
@@ -62,10 +62,10 @@ JNIEXPORT jint JNICALL JNIDEFINE(nativeStop)(JNIEnv* env, jclass clz) {
     return 0;
 }
 
-JNIEXPORT jint JNICALL JNIDEFINE(nativePushFrame)(JNIEnv* env, jclass clz, jint wid, jint hei, jbyteArray yuvData) {
+JNIEXPORT jint JNICALL JNIDEFINE(nativePushFrame)(JNIEnv* env, jclass clz, jbyteArray yuvData) {
     if ( streamer != NULL) {
         jbyte* cameraFrame= env->GetByteArrayElements(yuvData, NULL);
-        int ret = streamer->ProvideCameraFrame((unsigned char *)cameraFrame, wid, hei);
+        int ret = streamer->ProvideCameraFrame((unsigned char *)cameraFrame);
         env->ReleaseByteArrayElements(yuvData, cameraFrame, JNI_ABORT);
         return ret;
     } 

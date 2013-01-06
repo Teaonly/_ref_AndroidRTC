@@ -19,8 +19,7 @@ public:
     ~H264Encoder();
     
     int Prepare(int wid, int hei);
-    int Start();
-    int Stop();
+    int EncodePicture(unsigned char *yuv);
     int Release();
     
     sigslot::signal3<H264Encoder* , const unsigned char*, const unsigned int& > SignalCodedBuffer;

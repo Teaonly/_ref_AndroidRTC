@@ -17,7 +17,7 @@ public:
     ~RtpStreamer();
     
     int StartStreaming(const std::string& url, const std::string& description);
-    int ProvideCameraFrame(unsigned char *yuvData, int wid, int hei);
+    int ProvideCameraFrame(unsigned char *yuvData);
     int StopStreaming();
      
     sigslot::signal2<RtpStreamer*, const bool&> SignalStreamingBegin;
@@ -44,6 +44,7 @@ private:
     H264Encoder* encoder_;
     talk_base::Thread *streaming_thread_;
     talk_base::Thread *encoding_thread_;
+
     MediaURL url_;
     MediaDescription description_;    
 };

@@ -4,29 +4,29 @@
 #include "mediachannel.h"
 
 namespace talk_base{
-  class AsyncSocket;
+    class AsyncSocket;
 };
 
 class TcpMediaChannel: public MediaChannel { 
 public:
-  TcpMediaChannel();
-  virtual ~TcpMediaChannel();
+    TcpMediaChannel();
+    virtual ~TcpMediaChannel();
   
-  virtual bool Connect(const std::string &url);
-  virtual int PushData(const unsigned char *data, size_t Len);
-  virtual bool Close();
+    virtual void Connect(const MediaURL& url);
+    virtual int PushData(const unsigned char *data, size_t Len);
+    virtual int Close();
 
 protected:
-  void OnConnectEvent(talk_base::AsyncSocket* socket);
-  void OnCloseEvent(talk_base::AsyncSocket* socket, int err);
-  void OnReadEvent(talk_base::AsyncSocket* socket);  
+    void OnConnectEvent(talk_base::AsyncSocket* socket);
+    void OnCloseEvent(talk_base::AsyncSocket* socket, int err);
+    void OnReadEvent(talk_base::AsyncSocket* socket);  
 private:
-  int doConnect();
-  void createSocket();
+    int doConnect();
+    void createSocket();
 
 private:
-  talk_base::AsyncSocket* tcp_socket_;
-  std::string my_url_;
+    talk_base::AsyncSocket* tcp_socket_;
+    MediaURL my_url_; 
 };
 
 #endif

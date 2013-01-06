@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "helper.h"
 #include "rtpstreamer.h"
 #include "mediachannel.h"
@@ -5,6 +6,7 @@
 
 enum {
     MSG_START_CONNECT,
+    MSG_CHECK_CONNECT,
 };
 
 RtpStreamer::RtpStreamer(talk_base::Thread* streaming_thread, talk_base::Thread* encoding_thread) {
@@ -56,10 +58,12 @@ int RtpStreamer::StartStreaming(const std::string& url, const std::string& descr
     return 0;
 }
 
-int RtpStreamer::ProvideCameraFrame(unsigned char *yuvData, int wid, int hei) {
+int RtpStreamer::ProvideCameraFrame(unsigned char *yuvData) {
     if ( state_ == STATE_STREAMING) {
         return 0;
-    }    
+    }
+
+    
 
     return 1;
 }
@@ -79,7 +83,9 @@ int RtpStreamer::StopStreaming() {
 }
 
 void RtpStreamer::doConnect() {
-    
+    assert(channel_ != NULL);
+
+    channel_->Connect(url_);
 }
 
 void RtpStreamer::OnCodedBuffer(H264Encoder* enc, const unsigned char* codedBuffer, const unsigned int& length) {
@@ -87,7 +93,7 @@ void RtpStreamer::OnCodedBuffer(H264Encoder* enc, const unsigned char* codedBuff
 }
 
 void RtpStreamer::OnChannelOpened(MediaChannel *ch, const bool& isOK) {
-
+    SignalStreamingBegin(this, isOK);
 }
 
 void RtpStreamer::OnChannelClosed(MediaChannel *ch) {

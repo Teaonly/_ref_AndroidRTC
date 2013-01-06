@@ -45,14 +45,6 @@ int H264Encoder::Prepare(int wid, int hei) {
     return 0;
 }
 
-int H264Encoder::Start() {
-    return 0;
-}
-
-int H264Encoder::Stop() {
-    return 0;
-}
-
 int H264Encoder::Release() {
     x264_picture_clean(&x264_picin_);
     x264_picture_clean(&x264_picout_);

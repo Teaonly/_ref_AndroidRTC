@@ -14,7 +14,7 @@ TcpMediaChannel::~TcpMediaChannel() {
 }
 
 
-bool TcpMediaChannel::Close(){
+int TcpMediaChannel::Close(){
     if( tcp_socket_) {
         tcp_socket_->SignalCloseEvent.disconnect(this); 
         tcp_socket_->SignalConnectEvent.disconnect(this); 
@@ -22,7 +22,7 @@ bool TcpMediaChannel::Close(){
         delete tcp_socket_; 
         tcp_socket_ = NULL;
     }
-    return true;
+    return 0;
 }
 
 void TcpMediaChannel::createSocket() {
@@ -37,15 +37,10 @@ void TcpMediaChannel::createSocket() {
 }
 
 int TcpMediaChannel::doConnect() {
-    MediaURL murl;
     int port;
     std::string remote_addr;
-    if ( murl.Parse(my_url_) ) {
-        remote_addr = murl.location;
-        port = atoi( murl.resource.c_str());
-    } else {
-        return -1;
-    }  
+    remote_addr = my_url_.location;
+    port = atoi( my_url_.resource.c_str());
 
     talk_base::SocketAddress addr(remote_addr, port);
     LOGD( addr.ToString().c_str());
@@ -58,7 +53,7 @@ int TcpMediaChannel::doConnect() {
     return 1;
 }
 
-bool TcpMediaChannel::Connect(const std::string &url) {
+void TcpMediaChannel::Connect(const MediaURL& url) {
     my_url_ = url;
     is_ready_ = false;
     Close();
@@ -69,10 +64,7 @@ bool TcpMediaChannel::Connect(const std::string &url) {
     if ( ret < 0) {
         Close();    
         SignalChannelOpened(this, false); 
-        return true;
     }
-
-    return false;
 }
 
 int TcpMediaChannel::PushData(const unsigned char *data, size_t len) {
