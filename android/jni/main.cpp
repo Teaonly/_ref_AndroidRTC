@@ -1,5 +1,5 @@
 #include <string>
-#include "help.h"
+#include "helper.h"
 
 #define  JNIDEFINE(fname) Java_teaonly_rtc_MainActivity_##fname
 
@@ -21,7 +21,7 @@ static std::string convert_jstring(JNIEnv *env, const jstring &js) {
     return str;
 }
 
-JNIEXPORT jint JNICALL JNIDEFINE(nativeMain)(JNIEnv* env, jclass clz, jstring jremote, jint port, jint wid, jint hei) {
+JNIEXPORT jint JNICALL JNIDEFINE(nativeStart)(JNIEnv* env, jclass clz, jstring jremote, jint port, jint wid, jint hei) {
     std::string remote = convert_jstring(env, jremote); 
         
     return 0; 
@@ -33,5 +33,5 @@ JNIEXPORT jint JNICALL JNIDEFINE(nativeStop)(JNIEnv* env, jclass clz) {
 }
 
 JNIEXPORT jint JNICALL JNIDEFINE(nativePushFrame)(JNIEnv* env, jclass clz, jint wid, jint hei, jbyteArray yuvData) {
-
+    return 0;
 }

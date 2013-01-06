@@ -1,8 +1,6 @@
 #ifndef _TCPMEDIACHANNEL_H_
 #define _TCPMEDIACHANNEL_H_
 
-#include "talk/base/sigslot.h"
-#include "talk/base/thread.h"
 #include "mediachannel.h"
 
 namespace talk_base{
@@ -21,7 +19,7 @@ public:
 protected:
   void OnConnectEvent(talk_base::AsyncSocket* socket);
   void OnCloseEvent(talk_base::AsyncSocket* socket, int err);
-
+  void OnReadEvent(talk_base::AsyncSocket* socket);  
 private:
   int doConnect();
   void createSocket();

@@ -5,15 +5,6 @@
 #include "tcpmediachannel.h"
 #include "helper.h"
 
-#ifdef JNI_BASE
-#include <android/log.h>
-#define  LOG_TAG    "MVRS"
-#define  LOGD(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)  
-#else
-#define LOGD(...)  {}
-#endif
-
-
 TcpMediaChannel::TcpMediaChannel() {
     tcp_socket_ = NULL;
 }
@@ -130,7 +121,7 @@ void TcpMediaChannel::OnReadEvent(talk_base::AsyncSocket* socket) {
     assert(socket == tcp_socket_);
 
     unsigned char temp[2048];
-    int ret = sock_->Recv(temp, sizeof(temp) - 1);
+    int ret = tcp_socket_->Recv(temp, sizeof(temp) - 1);
     if (ret > 0) {
         SignalDataRead(this, temp, ret);
     }   

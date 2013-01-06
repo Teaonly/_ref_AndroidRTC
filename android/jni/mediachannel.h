@@ -18,9 +18,10 @@ public:
     return is_ready_;
   }
   
-  sigslot::signal1<MediaChannel*, const bool&> SignalChannelOpened;
+  sigslot::signal2<MediaChannel*, const bool&> SignalChannelOpened;
   sigslot::signal1<MediaChannel*> SignalChannelClosed;
   sigslot::signal3<MediaChannel*, const unsigned char*, const unsigned int&> SignalDataRead;
+
 protected:
   bool is_ready_; 
 };

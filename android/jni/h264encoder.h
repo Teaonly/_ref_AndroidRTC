@@ -1,5 +1,5 @@
-#ifndef _ENCODER_H_
-#define _ENCODER_H_
+#ifndef _H264ENCODER_H_
+#define _H264ENCODER_H_
 
 #include "talk/base/sigslot.h"
 #include "talk/base/thread.h"
@@ -23,7 +23,7 @@ public:
     int Stop();
     int Release();
     
-    sigslot::signal2<H264Encoder* , talk_base::Buffer& > SignalCodedBuffer;
+    sigslot::signal3<H264Encoder* , const unsigned char*, const unsigned int& > SignalCodedBuffer;
 
 protected:
     virtual void OnMessage(talk_base::Message *msg);

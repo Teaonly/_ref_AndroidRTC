@@ -1,5 +1,5 @@
 #include "helper.h"
-#include "encoder.h"
+#include "h264encoder.h"
 
 enum {
     MSG_START_ENCODER,
@@ -12,11 +12,13 @@ H264Encoder::H264Encoder(talk_base::Thread* thread) {
 }
 
 H264Encoder::~H264Encoder() {
-    encoding_thread_->Clear(this);
+    if ( x264_hdl_ != NULL) {
+        Release();    
+    }
 }
 
 void H264Encoder::OnMessage(talk_base::Message *msg) {
-   
+
 }
 
 int H264Encoder::Prepare(int wid, int hei) {
@@ -30,15 +32,16 @@ int H264Encoder::Prepare(int wid, int hei) {
 
     //opt.i_slice_count = 5;
     //opt.b_intra_refresh = 1;
+ 
+    // 3. Prepare the output buffer and target file
+    x264_picture_alloc(&x264_picin_, X264_CSP_I420, x264_opt_.i_width, x264_opt_.i_height);
+    x264_picture_alloc(&x264_picout_, X264_CSP_I420, x264_opt_.i_width, x264_opt_.i_height);
    
-    // 3. Building the encoder handler
+    // 4. Building the encoder handler
     x264_t *x264_hdl_ = x264_encoder_open(&x264_opt_);
     x264_encoder_parameters(x264_hdl_, &x264_opt_);
 
-    // 4. Prepare the output buffer and target file
-    x264_picture_alloc(&x264_picin_, X264_CSP_I420, x264_opt_.i_width, x264_opt_.i_height);
-    x264_picture_alloc(&x264_picout_, X264_CSP_I420, x264_opt_.i_width, x264_opt_.i_height);
- 
+
     return 0;
 }
 
@@ -51,10 +54,9 @@ int H264Encoder::Stop() {
 }
 
 int H264Encoder::Release() {
+    x264_picture_clean(&x264_picin_);
+    x264_picture_clean(&x264_picout_);
     x264_encoder_close(x264_hdl_);
-    
-    x264_picture_clean(&x264_picin);
-    x264_picture_clean(&x264_picout);
-   
+    x264_hdl_ = NULL;
     return 0;
 }
