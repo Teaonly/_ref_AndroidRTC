@@ -1,4 +1,9 @@
+#include "helper.h"
 #include "encoder.h"
+
+enum {
+    MSG_START_ENCODER,
+};
 
 
 H264Encoder::H264Encoder(talk_base::Thread* thread) {

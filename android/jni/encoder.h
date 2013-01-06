@@ -1,3 +1,6 @@
+#ifndef _ENCODER_H_
+#define _ENCODER_H_
+
 #include "talk/base/sigslot.h"
 #include "talk/base/thread.h"
 #include "talk/base/messagequeue.h"
@@ -35,3 +38,5 @@ private:
     unsigned int pciture_enc_;
     talk_base::CriticalSection mutex_;
 };
+
+#endif

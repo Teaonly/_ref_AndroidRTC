@@ -1,9 +1,6 @@
 #include <string>
-#include <jni.h>
-#include <android/log.h>
+#include "help.h"
 
-#define  LOG_TAG    "TEAONLY"
-#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #define  JNIDEFINE(fname) Java_teaonly_rtc_MainActivity_##fname
 
 extern "C" {
