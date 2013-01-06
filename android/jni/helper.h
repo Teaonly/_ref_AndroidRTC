@@ -4,11 +4,15 @@
 #include <vector>
 #include <string>
 
+#ifdef ANDROID
 #include <jni.h>
 #include <android/log.h>
 
 #define  LOG_TAG    "TEAONLY"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+#else
+#define  LOGD(...) 
+#endif
 
 /*
 tcp://10.10.10.10:342

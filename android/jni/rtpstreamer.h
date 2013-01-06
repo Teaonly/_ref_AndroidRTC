@@ -30,8 +30,16 @@ protected:
     void OnChannelClosed(MediaChannel *ch);
     void OnChannelDataRead(MediaChannel *ch, const unsigned char* data, const unsigned int& length);
 
+    void doConnect();
+
 private: 
-    bool inStreaming;
+    enum StreamingState{
+        STATE_IDLE,
+        STATE_CONNECTING,
+        STATE_STREAMING
+    };
+
+    StreamingState state_;
     MediaChannel* channel_;
     H264Encoder* encoder_;
     talk_base::Thread *streaming_thread_;

@@ -3,9 +3,12 @@
 #include "mediachannel.h"
 #include "h264encoder.h"
 
+enum {
+    MSG_START_CONNECT,
+};
 
 RtpStreamer::RtpStreamer(talk_base::Thread* streaming_thread, talk_base::Thread* encoding_thread) {
-    inStreaming = false;
+    state_ = STATE_IDLE;
     channel_ = NULL;
     encoder_ = NULL;
     streaming_thread_ = streaming_thread;
@@ -13,12 +16,13 @@ RtpStreamer::RtpStreamer(talk_base::Thread* streaming_thread, talk_base::Thread*
 }
 
 RtpStreamer::~RtpStreamer() {
-    if ( inStreaming )
-        StopStreaming();
+    StopStreaming();
 }
 
 void RtpStreamer::OnMessage(talk_base::Message *msg) {
-
+    if(msg->message_id == MSG_START_CONNECT ) {
+        doConnect();
+    }
 }
 
 int RtpStreamer::StartStreaming(const std::string& url, const std::string& description) {
@@ -46,8 +50,18 @@ int RtpStreamer::StartStreaming(const std::string& url, const std::string& descr
     channel_->SignalChannelOpened.connect(this, &RtpStreamer::OnChannelOpened);
     channel_->SignalChannelClosed.connect(this, &RtpStreamer::OnChannelClosed);
     channel_->SignalDataRead.connect(this, &RtpStreamer::OnChannelDataRead);
+    
+    streaming_thread_ ->Post(this, MSG_START_CONNECT);
 
     return 0;
+}
+
+int RtpStreamer::ProvideCameraFrame(unsigned char *yuvData, int wid, int hei) {
+    if ( state_ == STATE_STREAMING) {
+        return 0;
+    }    
+
+    return 1;
 }
 
 int RtpStreamer::StopStreaming() {
@@ -62,6 +76,10 @@ int RtpStreamer::StopStreaming() {
         channel_ = NULL;
     }
     return 0;
+}
+
+void RtpStreamer::doConnect() {
+    
 }
 
 void RtpStreamer::OnCodedBuffer(H264Encoder* enc, const unsigned char* codedBuffer, const unsigned int& length) {
