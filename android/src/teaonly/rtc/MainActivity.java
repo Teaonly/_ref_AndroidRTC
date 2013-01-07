@@ -63,13 +63,18 @@ public class MainActivity extends Activity
     implements View.OnTouchListener, CameraView.CameraReadyCallback, OverlayView.UpdateDoneCallback{
     private static final String TAG = "TEAONLY";
 
-    TeaServer webServer = null;
     private CameraView cameraView_;
     private OverlayView overlayView_;
     private ReentrantLock previewLock = new ReentrantLock(); 
     
-    private Button btnExit;
-    private TextView tvMessage1;
+    private Button btnStart;
+    private Button btnStop;
+    private TextView tvMessage;
+   
+    boolean inStreaming = false; 
+    private static native int nativeStart(String url, String description);
+    private static native int nativeStop();
+    private static native int nativePushFrame(byte[] frame);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,22 +87,25 @@ public class MainActivity extends Activity
 
         setContentView(R.layout.main);
 
-        btnExit = (Button)findViewById(R.id.btn_exit);
-        btnExit.setOnClickListener(exitAction);
-        tvMessage1 = (TextView)findViewById(R.id.tv_message1);
+        btnStart = (Button)findViewById(R.id.btn_start);
+        btnStart.setOnClickListener(startAction);
+        btnStop = (Button)findViewById(R.id.btn_stop);
+        btnStop.setOnClickListener(stopAction);
+        tvMessage = (TextView)findViewById(R.id.tv_message);
         
         initCamera();
+        
+        System.loadLibrary("jingle"); 
+        System.loadLibrary("app"); 
     }
     
     @Override
     public void onCameraReady() {
-        if ( initWebServer() ) {
-            int wid = cameraView_.Width();
-            int hei = cameraView_.Height();
-            cameraView_.StopPreview();
-            cameraView_.setupCamera(wid, hei, 3, previewCb_);
-            cameraView_.StartPreview();
-        }
+        int wid = cameraView_.Width();
+        int hei = cameraView_.Height();
+        cameraView_.StopPreview();
+        cameraView_.setupCamera(wid, hei, 3, previewCb_);
+        cameraView_.StartPreview();
     }
  
     @Override
@@ -122,8 +130,6 @@ public class MainActivity extends Activity
     @Override
     public void onPause(){  
         super.onPause();
-        if ( webServer != null)
-            webServer.stop();
         
         previewLock.lock();    
         cameraView_.StopPreview(); 
@@ -140,8 +146,6 @@ public class MainActivity extends Activity
 
     @Override 
     public boolean onTouch(View v, MotionEvent evt) { 
-        
-
         return false;
     }
   
@@ -155,93 +159,45 @@ public class MainActivity extends Activity
         overlayView_.setUpdateDoneCallback(this);
     }
     
-    public String getLocalIpAddress() {
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    //if (!inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress() && inetAddress.isSiteLocalAddress() ) {
-                    if (!inetAddress.isLoopbackAddress() && InetAddressUtils.isIPv4Address(inetAddress.getHostAddress()) ) {
-                        String ipAddr = inetAddress.getHostAddress();
-                        return ipAddr;
-                    }
-                }
-            }
-        } catch (SocketException ex) {
-            Log.d(TAG, ex.toString());
-        }
-        return null;
-    }   
-
-    private boolean initWebServer() {
-        String ipAddr = getLocalIpAddress();
-        if ( ipAddr != null ) {
-            try{
-                webServer = new TeaServer(8080, this); 
-                webServer.registerCGI("/cgi/start", doStart);
-                webServer.registerCGI("/cgi/stop", doStop);
-            }catch (IOException e){
-                webServer = null;
-            }
-        }
-        if ( webServer != null) {
-            tvMessage1.setText( getString(R.string.msg_access_local) + " http://" + ipAddr  + ":8080" );
-            return true;
-        } else {
-            tvMessage1.setText( getString(R.string.msg_error) );
-            return false;
-        }
-          
-    }
-   
-    private OnClickListener exitAction = new OnClickListener() {
+    private OnClickListener startAction = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            onPause();
+            if ( inStreaming == true)
+                return;
+
+            cameraView_.StopPreview();
+            cameraView_.setupCamera(640, 480, 3, previewCb_);
+            cameraView_.StartPreview();
+
+            int wid = cameraView_.Width();
+            int hei = cameraView_.Height();
+            
+            String url = "udp://10.239.77.163:5678";
+            String media = "video:h.264:" + Integer.toString(wid) + ":" + Integer.toString(hei);
+            if ( nativeStart(url, media) == 0) {
+                Log.d(TAG, "Start streaming is OK");
+                inStreaming = true;
+            }
         }   
     };
-   
+    private OnClickListener stopAction = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+        }   
+    };
+
     private PreviewCallback previewCb_ = new PreviewCallback() {
         public void onPreviewFrame(byte[] frame, Camera c) {
+            
             previewLock.lock();
+            
+            if ( inStreaming )
+                nativePushFrame(frame);
 
             c.addCallbackBuffer(frame);
             previewLock.unlock();
         }
     };
     
-    private TeaServer.CommonGatewayInterface doStop = new TeaServer.CommonGatewayInterface () {
-        @Override
-        public String run(Properties parms) {
-            return "OK";
-        }
-        
-        @Override 
-        public InputStream streaming(Properties parms) {
-            return null;
-        }    
-    }; 
-
-    private TeaServer.CommonGatewayInterface doStart = new TeaServer.CommonGatewayInterface () {
-        @Override
-        public String run(Properties parms) {
-            String remote = parms.getProperty("remote"); 
-            
-            int wid = 640;
-            int hei = 480; 
-            cameraView_.StopPreview();
-            cameraView_.setupCamera(wid, hei, 3, previewCb_);
-            cameraView_.StartPreview();
-            
-            return "OK";
-        }   
- 
-        @Override 
-        public InputStream streaming(Properties parms) {
-            return null;
-        }    
-    }; 
-
 }    
 

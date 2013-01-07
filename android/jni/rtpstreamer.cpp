@@ -38,34 +38,28 @@ int RtpStreamer::StartStreaming(const std::string& url, const std::string& descr
         // We don't support current
         return -1;
     }
-    
+     
     //create encoder and channel object
+    channel_ = CreateChannel(url_.proto, NULL);
+    if ( channel_ == NULL) {
+        return -1;
+    }
+    channel_->SignalChannelOpened.connect(this, &RtpStreamer::OnChannelOpened);
+    channel_->SignalChannelClosed.connect(this, &RtpStreamer::OnChannelClosed);
+    channel_->SignalDataRead.connect(this, &RtpStreamer::OnChannelDataRead);
+
     encoder_ = new H264Encoder(encoding_thread_);
     encoder_->SignalCodedBuffer.connect(this, &RtpStreamer::OnCodedBuffer);
-    if ( encoder_->Prepare(description_.width, description_.height) < 0) {
+    
+    if ( encoder_->Prepare(description_) < 0) {
         delete encoder_;
         encoder_ = NULL;
         return -1;
     }
-
-    channel_ = CreateChannel(url_.proto, NULL);
-    channel_->SignalChannelOpened.connect(this, &RtpStreamer::OnChannelOpened);
-    channel_->SignalChannelClosed.connect(this, &RtpStreamer::OnChannelClosed);
-    channel_->SignalDataRead.connect(this, &RtpStreamer::OnChannelDataRead);
-    
+      
     streaming_thread_ ->Post(this, MSG_START_CONNECT);
-
+    state_ = STATE_IDLE;
     return 0;
-}
-
-int RtpStreamer::ProvideCameraFrame(unsigned char *yuvData) {
-    if ( state_ == STATE_STREAMING) {
-        return 0;
-    }
-
-    
-
-    return 1;
 }
 
 int RtpStreamer::StopStreaming() {
@@ -84,24 +78,48 @@ int RtpStreamer::StopStreaming() {
 
 void RtpStreamer::doConnect() {
     assert(channel_ != NULL);
-
+    
     channel_->Connect(url_);
 }
 
-void RtpStreamer::OnCodedBuffer(H264Encoder* enc, const unsigned char* codedBuffer, const unsigned int& length) {
+int RtpStreamer::ProvideCameraFrame(unsigned char *yuvData) {
+    
+    LOGD("  ProvideCameraFrame, state_ = %d",  state_);
+    // in the calling thread
+    if ( state_ != STATE_STREAMING) {
+        return -1;
+    }
+    
+    encoder_->EncodePicture(yuvData);
+    return 0;
+}
 
+
+void RtpStreamer::OnCodedBuffer(H264Encoder* enc, const unsigned char* codedBuffer, const unsigned int& length) {
+    // in encoding thread 
+    
 }
 
 void RtpStreamer::OnChannelOpened(MediaChannel *ch, const bool& isOK) {
+    // in streaming thread
+    if ( isOK ) {
+        state_ = STATE_STREAMING;
+    }
+    LOGD("_______________________________OnChannelOpened = %d-------------, state_ = %d", isOK, state_);
     SignalStreamingBegin(this, isOK);
 }
 
 void RtpStreamer::OnChannelClosed(MediaChannel *ch) {
+    // in streaming thread
+    state_ = STATE_IDLE;
+    if ( encoder_ != NULL) {
+        encoder_->Release();
+    }  
 
+    SignalStreamingEnd(this);
 }
 
 void RtpStreamer::OnChannelDataRead(MediaChannel *ch, const unsigned char* data, const unsigned int& length) {
-
+    // handling RTCP package
 }
-
 

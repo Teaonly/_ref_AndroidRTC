@@ -6,6 +6,7 @@
 #include "talk/base/messagequeue.h"
 #include "talk/base/criticalsection.h"
 #include "talk/base/buffer.h"
+#include "helper.h"
 
 #include <stdint.h>
 #include <inttypes.h>
@@ -18,7 +19,7 @@ public:
     H264Encoder(talk_base::Thread* thread);
     ~H264Encoder();
     
-    int Prepare(int wid, int hei);
+    int Prepare(const MediaDescription& desc);
     int EncodePicture(unsigned char *yuv);
     int Release();
     
@@ -26,16 +27,20 @@ public:
 
 protected:
     virtual void OnMessage(talk_base::Message *msg);
+    void doEncoding();     
 
 private:
-    talk_base::Thread *encoding_thread_;
+    talk_base::CriticalSection mutex_;
+    unsigned int pciture_enc_;
+    int ppIndex;
     
+    talk_base::Thread *encoding_thread_;
     x264_param_t x264_opt_;;
     x264_t *x264_hdl_;
-    x264_picture_t x264_picin_;
+    
+    x264_picture_t x264_picin_[2];
+
     x264_picture_t x264_picout_;
-    unsigned int pciture_enc_;
-    talk_base::CriticalSection mutex_;
 };
 
 #endif

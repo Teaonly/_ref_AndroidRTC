@@ -13,11 +13,9 @@ UdpMediaChannel::~UdpMediaChannel() {
     Close();
 }
 
-
 int UdpMediaChannel::Close(){
     if( udp_socket_) {
-        udp_socket_->SignalCloseEvent.disconnect(this); 
-        udp_socket_->SignalConnectEvent.disconnect(this); 
+        udp_socket_->SignalReadEvent.disconnect(this); 
         udp_socket_->Close();
         delete udp_socket_; 
         udp_socket_ = NULL;

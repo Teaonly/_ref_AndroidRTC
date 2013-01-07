@@ -2,8 +2,7 @@
 <resources>
     <string name="app_name">Android RTC</string>
 
-    <string name="action_exit">Exit</string>
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
 
-    <string name="msg_access_local">Open at browser: </string>
-    <string name="msg_error">Error: Please enable wifi</string>
 </resources>
