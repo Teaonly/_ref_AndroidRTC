@@ -57,8 +57,9 @@ int RtpStreamer::StartStreaming(const std::string& url, const std::string& descr
         return -1;
     }
       
-    streaming_thread_ ->Post(this, MSG_START_CONNECT);
     state_ = STATE_IDLE;
+    streaming_thread_ ->Post(this, MSG_START_CONNECT);
+    
     return 0;
 }
 
@@ -83,8 +84,6 @@ void RtpStreamer::doConnect() {
 }
 
 int RtpStreamer::ProvideCameraFrame(unsigned char *yuvData) {
-    
-    LOGD("  ProvideCameraFrame, state_ = %d",  state_);
     // in the calling thread
     if ( state_ != STATE_STREAMING) {
         return -1;
@@ -105,7 +104,7 @@ void RtpStreamer::OnChannelOpened(MediaChannel *ch, const bool& isOK) {
     if ( isOK ) {
         state_ = STATE_STREAMING;
     }
-    LOGD("_______________________________OnChannelOpened = %d-------------, state_ = %d", isOK, state_);
+    
     SignalStreamingBegin(this, isOK);
 }
 
