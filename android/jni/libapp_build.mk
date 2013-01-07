@@ -4,5 +4,6 @@ LOCAL_SRC_FILES += \
             h264encoder.cpp \
             mediachannel.cpp \
             tcpmediachannel.cpp \
+            udpmediachannel.cpp \
             rtpstreamer.cpp
 

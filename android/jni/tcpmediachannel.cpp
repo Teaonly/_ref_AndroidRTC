@@ -126,14 +126,7 @@ void TcpMediaChannel::OnCloseEvent(talk_base::AsyncSocket* socket, int err) {
         return;
     }
 
+    is_ready_ = false;
     Close();
-
-    createSocket();
-    int ret = doConnect();
-
-    if ( ret < 0) {
-        is_ready_ = false;
-        Close();
-        SignalChannelClosed(this);
-    }
+    SignalChannelClosed(this);
 }
