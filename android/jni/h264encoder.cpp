@@ -41,9 +41,9 @@ int H264Encoder::Prepare(const MediaDescription& desc) {
     //opt.b_intra_refresh = 1;
     
     // 3. Prepare the output buffer and target file
-    x264_picture_alloc(&x264_picin_[0], X264_CSP_I420, x264_opt_.i_width, x264_opt_.i_height);
-    x264_picture_alloc(&x264_picin_[1], X264_CSP_I420, x264_opt_.i_width, x264_opt_.i_height);
-    x264_picture_alloc(&x264_picout_, X264_CSP_I420, x264_opt_.i_width, x264_opt_.i_height);
+    x264_picture_alloc(&x264_picin_[0], X264_CSP_NV12, x264_opt_.i_width, x264_opt_.i_height);
+    x264_picture_alloc(&x264_picin_[1], X264_CSP_NV12, x264_opt_.i_width, x264_opt_.i_height);
+    x264_picture_alloc(&x264_picout_, X264_CSP_NV12, x264_opt_.i_width, x264_opt_.i_height);
     ppIndex = -1;
 
     // 4. Building the encoder handler
@@ -69,22 +69,23 @@ int H264Encoder::EncodePicture(unsigned char *yuv) {
     if ( x264_hdl_ == NULL)
         return -1;
 
+    encoding_thread_->Clear(this);
+    
+    // FIXME:   NV21 ---> NV12  
     int width = x264_opt_.i_width;
     int height = x264_opt_.i_height;
-   
     if ( ppIndex == -1 ) {
         ppIndex = 0;
         memcpy(x264_picin_[ppIndex].img.plane[0], yuv, width*height);
-        memcpy(x264_picin_[ppIndex].img.plane[1], yuv + width*height, width*height/4);
-        memcpy(x264_picin_[ppIndex].img.plane[2], yuv + width*height + width*height/4, width*height/4);
+        memcpy(x264_picin_[ppIndex].img.plane[1], yuv + width*height - 1, width*height/2);
+        //memcpy(x264_picin_[ppIndex].img.plane[2], yuv + width*height + width*height/4, width*height/4);
     } else {
         int index = 1 - ppIndex;
         memcpy(x264_picin_[index].img.plane[0], yuv, width*height);
-        memcpy(x264_picin_[index].img.plane[1], yuv + width*height, width*height/4);
-        memcpy(x264_picin_[index].img.plane[2], yuv + width*height + width*height/4, width*height/4);
+        memcpy(x264_picin_[index].img.plane[1], yuv + width*height - 1, width*height/2);
+        //memcpy(x264_picin_[index].img.plane[2], yuv + width*height + width*height/4, width*height/4);
     }
 
-    encoding_thread_->Clear(this);
     encoding_thread_->Post(this, MSG_START_ENCODER);
     
     return 0;
@@ -95,10 +96,11 @@ void H264Encoder::doEncoding() {
     int nals;
     x264_nal_t *nal_pointer;
     x264_encoder_encode(x264_hdl_, &nal_pointer, &nals, &x264_picin_[ppIndex], &x264_picout_);    
-    LOGD("New frame is encoded!"); 
+    
     // fetching the current data
     for ( int i = 0; i < nals; i++) {
-        LOGD("\tpayload size = %d", nal_pointer[i].i_payload);
+        if( nal_pointer[i].i_type != 6)
+            SignalCodedNAL(this, &nal_pointer[i], 0);
     }  
     
     ppIndex = 1 - ppIndex;

@@ -23,7 +23,7 @@ public:
     int EncodePicture(unsigned char *yuv);
     int Release();
     
-    sigslot::signal3<H264Encoder* , const unsigned char*, const unsigned int& > SignalCodedBuffer;
+    sigslot::signal3<H264Encoder* , x264_nal_t*, const unsigned int&> SignalCodedNAL;
 
 protected:
     virtual void OnMessage(talk_base::Message *msg);

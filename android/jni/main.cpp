@@ -48,7 +48,7 @@ JNIEXPORT jint JNICALL JNIDEFINE(nativeStart)(JNIEnv* env, jclass clz, jstring j
     }
 
     streamer = new RtpStreamer(streaming_thread, encoding_thread);
-    int ret = streamer->StartStreaming(remote, description);
+    int ret = streamer->StartStreaming(remote, description, 0x19791010);
     
     if ( ret < 0) {
         delete streamer;

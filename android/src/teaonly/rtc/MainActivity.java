@@ -174,6 +174,7 @@ public class MainActivity extends Activity
             
             String url = "udp://10.239.77.163:5678";
             String media = "video:h.264:" + Integer.toString(wid) + ":" + Integer.toString(hei);
+
             if ( nativeStart(url, media) == 0) {
                 Log.d(TAG, "Start streaming is OK");
                 inStreaming = true;

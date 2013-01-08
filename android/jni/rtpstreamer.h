@@ -8,15 +8,23 @@
 #include "talk/base/criticalsection.h"
 #include "talk/base/buffer.h"
 
+#include <stdint.h>
+#include <inttypes.h>
+extern "C" {
+#include <x264.h>
+}
+
+
 class MediaChannel;
 class H264Encoder;
+class MediaBuffer;
 
 class RtpStreamer: public sigslot::has_slots<>, public talk_base::MessageHandler {
 public:
     RtpStreamer(talk_base::Thread* sreaming_thread, talk_base::Thread* encoding_thread);
     ~RtpStreamer();
     
-    int StartStreaming(const std::string& url, const std::string& description);
+    int StartStreaming(const std::string& url, const std::string& description, const unsigned int& ssrc);
     int ProvideCameraFrame(unsigned char *yuvData);
     int StopStreaming();
      
@@ -25,7 +33,8 @@ public:
 
 protected:
     virtual void OnMessage(talk_base::Message *msg);
-    void OnCodedBuffer(H264Encoder* enc, const unsigned char* codedBuffer, const unsigned int& length);
+    void OnCodedNAL(H264Encoder* enc, x264_nal_t* nal, const unsigned int& ts);
+
     void OnChannelOpened(MediaChannel *ch, const bool& isOK);
     void OnChannelClosed(MediaChannel *ch);
     void OnChannelDataRead(MediaChannel *ch, const unsigned char* data, const unsigned int& length);
@@ -45,8 +54,11 @@ private:
     talk_base::Thread *streaming_thread_;
     talk_base::Thread *encoding_thread_;
 
+    MediaBuffer *buffer_;
     MediaURL url_;
     MediaDescription description_;    
+    unsigned int rtpSSRC_;
+    unsigned short rtpSeq_;
 };
 
 

@@ -67,7 +67,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libapp
 LOCAL_CPPFLAGS := -O2 -Wall  
 LOCAL_C_INCLUDES :=  $(LOCAL_PATH)/x264
-
+LOCAL_CPP_EXTENSION := .cc .cpp
 ifeq ($(TARGET_ARCH_ABI),armeabi)
     LOCAL_CFLAGS += -DNDK_ARM    
 endif
