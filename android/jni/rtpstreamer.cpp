@@ -130,11 +130,17 @@ void RtpStreamer::OnCodedNAL(H264Encoder* enc, x264_nal_t* nal, const unsigned i
         return;
     } else {
         // n rtp 1 NAL
-        int subSeq = 0;
+        int nPkgs = (nal->i_payload - (nal->b_long_startcode)/8) / kMaxPayloadSize;
+        if (  (nal->i_payload - (nal->b_long_startcode)/8) % kMaxPayloadSize ) {
+            nPkgs ++;
+        }
+
         unsigned char* nalData = nal->p_payload + (nal->b_long_startcode/8) + 1;
-        nalDataLen -= 1;
-        while(nalDataLen == 0) {
-            int thisRtpLenth = nalDataLen > kMaxPayloadSize? kMaxPayloadSize: nalDataLen; 
+        for(int i = 0; i < nPkgs; i++) {
+            int currentPayloadLength = kMaxPayloadSize;
+            if ( i == nPkgs -1 ) {
+                currentPayloadLength = (nal->i_payload - (nal->b_long_startcode)/8) % kMaxPayloadSize;
+            }
 
             cricket::SetRtpHeaderFlags(rtp_package, 0, 0, 0, 0); 
             cricket::SetRtpPayloadType(rtp_package, 0, 35); 
@@ -149,19 +155,16 @@ void RtpStreamer::OnCodedNAL(H264Encoder* enc, x264_nal_t* nal, const unsigned i
             // FU-A : FU header
             rtp_package[kRTPHeaderSize+1] = nal->p_payload[ (nal->b_long_startcode/8) ];
             rtp_package[kRTPHeaderSize+1] = rtp_package[kRTPHeaderSize+1] & 0x3F;
-            if (subSeq == 0) {
+            if (i == 0) {
                 rtp_package[kRTPHeaderSize+1] = rtp_package[kRTPHeaderSize+1] | 0x80;
-            } else if ( thisRtpLenth == nalDataLen ) {
+            } else if ( i == (nPkgs - 1) ) {
                 rtp_package[kRTPHeaderSize+1] = rtp_package[kRTPHeaderSize+1] | 0x40;
             }
-            
-            memcpy(&rtp_package[kRTPHeaderSize+2], nalData, thisRtpLenth);
-            buffer_->PushBuffer(rtp_package, thisRtpLenth + kRTPHeaderSize + 2);
+            memcpy(&rtp_package[kRTPHeaderSize+2], nalData + i*kMaxPayloadSize, currentPayloadLength );
+            buffer_->PushBuffer(rtp_package, currentPayloadLength + kRTPHeaderSize + 2);
 
-            subSeq++;
             rtpSeq_++;
-            nalDataLen -= thisRtpLenth;
-        }        
+        }
     }
 }
 
