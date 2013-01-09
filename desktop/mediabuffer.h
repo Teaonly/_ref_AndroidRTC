@@ -51,6 +51,8 @@ private:
   MediaPackage *pkg_released;
   
   talk_base::CriticalSection mutex_; 
+  friend class RtpSinker;
+
 };
 
 #endif

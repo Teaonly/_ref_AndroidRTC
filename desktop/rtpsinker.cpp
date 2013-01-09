@@ -117,6 +117,5 @@ void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, co
     } else {                        //Singla NAL
         // TODO , one coded picture is OK.
     }
-    
 }
 
