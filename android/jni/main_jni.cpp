@@ -3,7 +3,6 @@
 #include "helper.h"
 #include "rtpstreamer.h"
 
-
 #define  JNIDEFINE(fname) Java_teaonly_rtc_MainActivity_##fname
 
 extern "C" {
