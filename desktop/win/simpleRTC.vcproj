@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -40,7 +40,6 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
 				AdditionalIncludeDirectories="..\;.\libexpat;&quot;%(AdditionalIncludeDirectories)&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;BUILDLL_EXPORTS;XML_STATIC;EXPAT_RELATIVE_PATH;FEATURE_ENABLE_SSL;COMPILED_FROM_DSP"
 				MinimalRebuild="true"
@@ -773,6 +772,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\datachannel.h"
+				>
+			</File>
+			<File
 				RelativePath="..\main.cpp"
 				>
 			</File>
@@ -781,7 +784,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\mediabuffer.cpp"
+				RelativePath="..\media.h"
 				>
 			</File>
 			<File
@@ -789,7 +792,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\rtpsinker.h"
+				>
+			</File>
+			<File
 				RelativePath="..\udpdatachannel.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\udpdatachannel.h"
 				>
 			</File>
 		</Filter>
