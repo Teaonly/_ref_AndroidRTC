@@ -43,7 +43,7 @@ int UdpDataChannel::bindSocket() {
 }    
 
 void UdpDataChannel::Listen(const MediaURL& url) {
-   my_url_ = url;
+    my_url_ = url;
     Close();
 
     int ret = createSocket();
@@ -114,6 +114,7 @@ void UdpDataChannel::OnReadEvent(talk_base::AsyncSocket* socket) {
     int ret = udp_socket_->RecvFrom(temp, sizeof(temp) - 1, &addr);
     if (ret > 0) {
         bool isValid = false;
+		std::cout << "get data from udp socket!" << std::endl;
         SignalDataRead(this, temp, ret, isValid);
         if ( isValid && !remote_addr_.IsNil() ) {
             remote_addr_ = addr;

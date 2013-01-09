@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="probice"
+	Name="simpleRTC"
 	ProjectGUID="{C3F0715A-FA91-49F6-A1BC-E770823F13EB}"
 	RootNamespace="buildll"
 	Keyword="Win32Proj"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\;&quot;.\libexpat;&quot;%(AdditionalIncludeDirectories)&quot;"
+				AdditionalIncludeDirectories="..\;.\libexpat;&quot;%(AdditionalIncludeDirectories)&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;BUILDLL_EXPORTS;XML_STATIC;EXPAT_RELATIVE_PATH;FEATURE_ENABLE_SSL;COMPILED_FROM_DSP"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -489,6 +489,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\talk\session\phone\rtputils.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\talk\xmpp\saslmechanism.cc"
 				>
 			</File>
@@ -760,14 +764,14 @@
 				RelativePath="..\talk\xmpp\xmpptask.cc"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="SimpleRTC"
+			>
 			<File
-				RelativePath="..\talk\session\phone\rtputils.cc"
+				RelativePath="..\datachannel.cpp"
 				>
 			</File>
-        </Filter>
-		<Filter
-			Name="probice"
-			>
 			<File
 				RelativePath="..\main.cpp"
 				>
@@ -777,19 +781,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\datachannel.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\udpdatachannel.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\mediabuffer.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\rtpsinker.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\udpdatachannel.cpp"
 				>
 			</File>
 		</Filter>
