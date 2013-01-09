@@ -40,6 +40,7 @@ protected:
     void OnChannelDataRead(MediaChannel *ch, const unsigned char* data, const unsigned int& length);
 
     void doConnect();
+    void doStreaming();
 
 private: 
     enum StreamingState{

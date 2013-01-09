@@ -1,6 +1,6 @@
 LOCAL_SRC_FILES += \
             talk/session/phone/rtputils.cc\
-            main.cpp \
+            main_jni.cpp \
             helper.cpp \
             h264encoder.cpp \
             mediachannel.cpp \

@@ -36,6 +36,8 @@ int UdpMediaChannel::createSocket() {
     remote_addr = my_url_.location;
     port = atoi( my_url_.resource.c_str());
 
+    LOGD(" Remote Address = %s", remote_addr.c_str());
+
     talk_base::SocketAddress addr(remote_addr, port);
     remote_addr_ = addr;
 
@@ -62,9 +64,11 @@ void UdpMediaChannel::Connect(const MediaURL& url) {
 int UdpMediaChannel::PushData(const unsigned char *data, size_t len) {
     if ( udp_socket_ == NULL)
         return -1;
-
+    
+    /*
     if ( udp_socket_->GetState() == talk_base::Socket::CS_CONNECTING)
         return 0;
+    */        
 
     int result = udp_socket_->SendTo(data, len, remote_addr_);
     if (result < 0) {
@@ -72,7 +76,7 @@ int UdpMediaChannel::PushData(const unsigned char *data, size_t len) {
             return 0;
         return -1;
     }
-
+    LOGD("UDP Sendto return = %d", result);
     return result;
 }
 

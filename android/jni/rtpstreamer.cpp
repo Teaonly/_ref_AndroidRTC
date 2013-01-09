@@ -9,6 +9,7 @@
 enum {
     MSG_START_CONNECT,
     MSG_CHECK_CONNECT,
+    MSG_STREAMING_TIMER,
 };
 
 const int kMaxRTPSize = 1350;
@@ -35,6 +36,8 @@ RtpStreamer::~RtpStreamer() {
 void RtpStreamer::OnMessage(talk_base::Message *msg) {
     if(msg->message_id == MSG_START_CONNECT ) {
         doConnect();
+    } else if ( msg->message_id == MSG_STREAMING_TIMER) {
+        doStreaming();
     }
 }
 
@@ -96,6 +99,17 @@ void RtpStreamer::doConnect() {
     assert(channel_ != NULL);
     
     channel_->Connect(url_);
+}
+
+void RtpStreamer::doStreaming() {
+    if ( state_ == STATE_STREAMING ) {
+        if ( buffer_->PullBuffer() ) {
+            MediaPackage* pkg = buffer_->Released();
+            LOGD("Sending rtp package len=%d", pkg->length);
+            channel_->PushData(pkg->data, pkg->length);
+        }
+        streaming_thread_->PostDelayed(10, this, MSG_STREAMING_TIMER);
+    } 
 }
 
 int RtpStreamer::ProvideCameraFrame(unsigned char *yuvData) {
@@ -172,6 +186,7 @@ void RtpStreamer::OnChannelOpened(MediaChannel *ch, const bool& isOK) {
     // in streaming thread
     if ( isOK ) {
         state_ = STATE_STREAMING;
+        streaming_thread_->PostDelayed(10, this, MSG_STREAMING_TIMER);
     }
     
     SignalStreamingBegin(this, isOK);

@@ -48,7 +48,6 @@ bool MediaBuffer::PushBuffer(const unsigned char *d, const unsigned int len) {
   MediaPackage *pkg = NULL;
   pkg_seq_ ++;
 
-  LOGD("PushBuffer is called, len = %d", len);
   // check memory space.
   if ( len > pkg_size_ ) {
     return false;
