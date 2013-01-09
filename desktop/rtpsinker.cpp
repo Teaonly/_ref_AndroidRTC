@@ -93,6 +93,30 @@ void RtpSinker::OnChannelClosed(DataChannel *ch) {
 
 void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, const unsigned int& length, bool& isValid) {
     // handling RTP package
+	unsigned int ssrc;
+	cricket::GetRtpSsrc(data, length, &ssrc);
+	if ( ssrc != rtpSSRC_) {
+        isValid = false;
+        return;
+	}
     isValid = true;
+
+    unsigned char payloadType = data[kRTPHeaderSize] & 0x1F;
+    unsigned char nalFlag = data[kRTPHeaderSize+1] & 0xE0;
+    if ( payloadType == 28) {       //FA-U
+        if ( nalFlag & 0x80) {      //first rtp package of a new FA-U NAL
+            if ( buffer_->BufferSize() > 0) {
+                buffer_->Reset();   //FIXME: we drop some RTP because new NAL is incoming
+            }
+            buffer_->PushBuffer(data, length);
+        } else if ( nalFlag & 0x40) {
+            // TODO , one coded picture is OK.
+        } else {
+            buffer_->PushBuffer(data, length);
+        }
+    } else {                        //Singla NAL
+        // TODO , one coded picture is OK.
+    }
+    
 }
 

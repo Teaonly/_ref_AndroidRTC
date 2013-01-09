@@ -788,6 +788,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\mediabuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\mediabuffer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\rtpsinker.cpp"
 				>
 			</File>
