@@ -92,6 +92,8 @@ void RtpSinker::OnChannelClosed(DataChannel *ch) {
 }
 
 void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, const unsigned int& length, bool& isValid) {
+    static unsigned codedPicture[1024*1024];
+
     // handling RTP package
 	unsigned int ssrc;
 	cricket::GetRtpSsrc(data, length, &ssrc);
@@ -103,19 +105,41 @@ void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, co
 
     unsigned char payloadType = data[kRTPHeaderSize] & 0x1F;
     unsigned char nalFlag = data[kRTPHeaderSize+1] & 0xE0;
+
+    // for some resone, we don't resport the rtp package according to rtp seq 
     if ( payloadType == 28) {       //FA-U
         if ( nalFlag & 0x80) {      //first rtp package of a new FA-U NAL
             if ( buffer_->BufferSize() > 0) {
-                buffer_->Reset();   //FIXME: we drop some RTP because new NAL is incoming
+                buffer_->Reset();   //FIXME: we drop some RTP because new NAL is coming
             }
             buffer_->PushBuffer(data, length);
         } else if ( nalFlag & 0x40) {
-            // TODO , one coded picture is OK.
+            if ( buffer_->BufferSize() == 0) {
+                return;             // drop this rtp
+            }
+#if 0            
+            // combing all the rtp
+            unsigned int len = 0;
+            for(int i = 0; i < buffer_->BufferSize(); i++) {     
+                memcpy( &codedPicture[len], buffer_->buffer_[i]->data, buffer_->buffer_[i]->length);
+                len += buffer_->buffer_[i]->length;
+            }
+            buffer_->Reset();
+            memcpy(&codedPicture[len], length);
+            len += length;
+            SignalCodedPicture(this, codedPicture, len);
+#endif
         } else {
+            if ( buffer_->BufferSize() == 0) {
+                return;             // drop this rtp
+            }
             buffer_->PushBuffer(data, length);
         }
     } else {                        //Singla NAL
-        // TODO , one coded picture is OK.
+        if ( buffer_->BufferSize() > 0) {
+            buffer_->Reset();   //FIXME: we drop some RTP because new NAL is coming
+        }
+        //SignalCodedPicture(this, data, 
     }
 }
 
