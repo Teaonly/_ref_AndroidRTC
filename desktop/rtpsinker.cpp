@@ -55,7 +55,7 @@ int RtpSinker::StartSinking(const std::string& url, const std::string& descripti
 
     buffer_->Reset();
     state_ = STATE_IDLE;
-    streaming_thread_ ->Post(this, MSG_START_LISTEN);
+    streaming_thread_->Post(this, MSG_START_LISTEN);
 
     return 0;
 }
@@ -113,22 +113,13 @@ void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, co
                 buffer_->Reset();   //FIXME: we drop some RTP because new NAL is coming
             }
             buffer_->PushBuffer(data, length);
-        } else if ( nalFlag & 0x40) {
+        } else if ( nalFlag & 0x40) {   //end of NAL
             if ( buffer_->BufferSize() == 0) {
                 return;             // drop this rtp
-            }
-#if 0            
-            // combing all the rtp
-            unsigned int len = 0;
-            for(int i = 0; i < buffer_->BufferSize(); i++) {     
-                memcpy( &codedPicture[len], buffer_->buffer_[i]->data, buffer_->buffer_[i]->length);
-                len += buffer_->buffer_[i]->length;
-            }
-            buffer_->Reset();
-            memcpy(&codedPicture[len], length);
-            len += length;
-            SignalCodedPicture(this, codedPicture, len);
-#endif
+            }            
+            buffer_->PushBuffer(data, length);
+            convertMultipulNAL();
+
         } else {
             if ( buffer_->BufferSize() == 0) {
                 return;             // drop this rtp
@@ -138,8 +129,30 @@ void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, co
     } else {                        //Singla NAL
         if ( buffer_->BufferSize() > 0) {
             buffer_->Reset();   //FIXME: we drop some RTP because new NAL is coming
-        }
-        //SignalCodedPicture(this, data, 
+        }   
+        buffer_->PushBuffer(data, length);
+        convertSignalNAL();  
     }
+}
+
+void RtpSinker::convertSignalNAL() {
+    unsigned char *data = buffer_->buffer_.front()->data;
+    unsigned int length = buffer_->buffer_.front()->length;
+    unsigned int timeStamp;
+    cricket::GetRtpTimestamp(data, length, &timeStamp);
+    
+    unsigned char *nal = &data[kRTPHeaderSize - 4];
+    nal[0] = 0x00;
+    nal[1] = 0x00;
+    nal[2] = 0x00;
+    nal[3] = 0x00;
+    
+    int len = length - kRTPHeaderSize + 4;
+    SignalCodedPicture(this, nal, len, timeStamp);
+    buffer_->Reset();
+}
+
+void RtpSinker::convertMultipulNAL() {
+        
 }
 

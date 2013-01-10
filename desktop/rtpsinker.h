@@ -21,7 +21,7 @@ public:
      
     sigslot::signal2<RtpSinker*, const bool&> SignalSinkingBegin;
     sigslot::signal1<RtpSinker*> SignalSinkingEnd;
-    sigslot::signal5<RtpSinker*, const char*, const unsigned int&, const unsigned int&, const unsigned int&> SignalCodedPicture;
+    sigslot::signal4<RtpSinker*, const unsigned char*, const unsigned int&, const unsigned int&> SignalCodedPicture;
 
 protected:
     virtual void OnMessage(talk_base::Message *msg);
@@ -30,6 +30,9 @@ protected:
     void OnChannelClosed(DataChannel *ch);
     void OnChannelDataRead(DataChannel *ch, const unsigned char* data, const unsigned int& length, bool& isValid);
     void doListen();
+    
+    void convertSignalNAL();
+    void convertMultipulNAL();
 
 private: 
     enum SinkingState{
