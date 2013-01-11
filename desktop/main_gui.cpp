@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
+#include <iostream>
 #include "talk/base/thread.h"
 #include "rtpsinker.h"
-
+#include "videodialog.h"
 
 class SinkerReceiver: public sigslot::has_slots<> {
 public:    
@@ -34,6 +35,10 @@ int main(int argc, char *argv[]) {
     std::string description = "video:h.264:640:480";
     sinker->StartSinking(localAddr, description, 0x19791010);
     
-    talk_base::Thread::Current()->Run();
-    return 0;
+    QApplication app(argc, argv);
+
+    VideoDialog vDialog(&app);
+    vDialog.show();
+
+    return app.exec();
 }

@@ -19,6 +19,7 @@ SOURCES += \
     main_gui.cpp \
     videowidget.cpp \
     videowidgetsurface.cpp \ 
+    videodialog.cpp \
     media.cpp \
     datachannel.cpp \
     udpdatachannel.cpp \
@@ -28,4 +29,8 @@ SOURCES += \
 HEADERS += \
     videowidget.h \
     videowidgetsurface.h \
-    rtpsinker.h 
+    videodialog.h
+
+FORMS += \
+    player.ui
+    
