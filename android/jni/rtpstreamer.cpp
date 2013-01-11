@@ -129,8 +129,12 @@ void RtpStreamer::OnCodedNAL(H264Encoder* enc, x264_nal_t* nal, const unsigned i
 
     // in encoding thread 
     unsigned char rtp_package[1024*2];
-   
-    int nalDataLen = nal->i_payload - (nal->b_long_startcode/8);
+    
+    unsigned int startCode = 4;
+    if ( nal->b_long_startcode == 0) {
+        startCode = 3;
+    }
+    int nalDataLen = nal->i_payload - startCode;
     if ( nalDataLen <= kMaxPayloadSize ) {
         // one rtp  one NAL
         cricket::SetRtpHeaderFlags(rtp_package, 0, 0, 0, 0); //padding = 0, externsion = 0, crsc_count = 0
@@ -138,22 +142,24 @@ void RtpStreamer::OnCodedNAL(H264Encoder* enc, x264_nal_t* nal, const unsigned i
         cricket::SetRtpSeqNum(rtp_package, 0, rtpSeq_); 
         cricket::SetRtpTimestamp(rtp_package, 0, ts);
         cricket::SetRtpSsrc(rtp_package, 0, rtpSSRC_);
-        memcpy(&rtp_package[kRTPHeaderSize], nal->p_payload + (nal->b_long_startcode/8), nalDataLen);
+        memcpy(&rtp_package[kRTPHeaderSize], nal->p_payload + startCode, nalDataLen);
         buffer_->PushBuffer(rtp_package, nalDataLen + kRTPHeaderSize);
         rtpSeq_++;
         return;
     } else {
         // n rtp 1 NAL
-        int nPkgs = (nal->i_payload - (nal->b_long_startcode)/8) / kMaxPayloadSize;
-        if (  (nal->i_payload - (nal->b_long_startcode)/8) % kMaxPayloadSize ) {
+        int nPkgs = (nal->i_payload - startCode - 1) / kMaxPayloadSize;
+        if (  (nal->i_payload - startCode ) % kMaxPayloadSize ) {
             nPkgs ++;
         }
 
-        unsigned char* nalData = nal->p_payload + (nal->b_long_startcode/8) + 1;
+        unsigned char* nalData = nal->p_payload + startCode + 1;
         for(int i = 0; i < nPkgs; i++) {
             int currentPayloadLength = kMaxPayloadSize;
             if ( i == nPkgs -1 ) {
-                currentPayloadLength = (nal->i_payload - (nal->b_long_startcode)/8) % kMaxPayloadSize;
+                currentPayloadLength = (nal->i_payload - startCode - 1) % kMaxPayloadSize;
+                if ( currentPayloadLength == 0)
+                    currentPayloadLength = kMaxPayloadSize;
             }
 
             cricket::SetRtpHeaderFlags(rtp_package, 0, 0, 0, 0); 
@@ -163,11 +169,11 @@ void RtpStreamer::OnCodedNAL(H264Encoder* enc, x264_nal_t* nal, const unsigned i
             cricket::SetRtpSsrc(rtp_package, 0, rtpSSRC_); 
 
             // FU-A : FU indicator 
-            rtp_package[kRTPHeaderSize] = nal->p_payload[ (nal->b_long_startcode/8) ];
+            rtp_package[kRTPHeaderSize] = nal->p_payload[ startCode ];
             rtp_package[kRTPHeaderSize] = rtp_package[kRTPHeaderSize] & 0xE0;
             rtp_package[kRTPHeaderSize] = rtp_package[kRTPHeaderSize] + 28;
             // FU-A : FU header
-            rtp_package[kRTPHeaderSize+1] = nal->p_payload[ (nal->b_long_startcode/8) ];
+            rtp_package[kRTPHeaderSize+1] = nal->p_payload[ startCode ];
             rtp_package[kRTPHeaderSize+1] = rtp_package[kRTPHeaderSize+1] & 0x3F;
             if (i == 0) {
                 rtp_package[kRTPHeaderSize+1] = rtp_package[kRTPHeaderSize+1] | 0x80;
