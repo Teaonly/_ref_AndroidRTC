@@ -2,7 +2,7 @@ TALK_INC_DIR = ./
 
 AR = ar
 CC = g++
-CFLAGS = -Wall -fno-rtti -fno-exceptions -fvisibility=hidden -ffunction-sections -fdata-sections -gdwarf-2 -g3 -O0 -DHAMMER_TIME=1 -DLOGGING=1 -DFEATURE_ENABLE_SSL -DHASHNAMESPACE=__gnu_cxx -DPOSIX -DDISABLE_DYNAMIC_CAST -DHAVE_OPENSSL_SSL_H=1 -D_REENTRANT -DOSX -D_DEBUG -DEXPAT_RELATIVE_PATH -I$(TALK_INC_DIR) 
+CFLAGS = -Wall -arch x86_64 -Xarch_x86_64 -O0 -DHAMMER_TIME=1 -DLOGGING=1 -DFEATURE_ENABLE_SSL -DHASHNAMESPACE=__gnu_cxx -DPOSIX -DDISABLE_DYNAMIC_CAST -DHAVE_OPENSSL_SSL_H=1 -D_REENTRANT -DOSX -D_DEBUG -DEXPAT_RELATIVE_PATH -I$(TALK_INC_DIR) 
 LDFLAGS = -lexpat -lssl -lcrypto -framework CoreFoundation -framework Carbon -framework Security -framework SystemConfiguration 
 
 OBJS_DIR = ./obj

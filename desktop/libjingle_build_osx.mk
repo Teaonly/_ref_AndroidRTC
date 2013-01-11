@@ -143,4 +143,5 @@ LIB_SRCS = \
 	talk/examples/login/jingleinfotask.cc\
 	talk/examples/login/xmppauth.cc\
 	talk/examples/login/xmpppump.cc\
-	talk/examples/login/xmppsocket.cc
+	talk/examples/login/xmppsocket.cc\
+    talk/session/phone/rtputils.cc\

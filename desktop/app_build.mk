@@ -1,5 +1,4 @@
 APP_SRCS = \
-           talk/session/phone/rtputils.cc\
            main.cpp \
            media.cpp \
            datachannel.cpp \
