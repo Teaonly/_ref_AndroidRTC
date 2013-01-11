@@ -92,8 +92,6 @@ void RtpSinker::OnChannelClosed(DataChannel *ch) {
 }
 
 void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, const unsigned int& length, bool& isValid) {
-    static unsigned codedPicture[1024*1024];
-
     // handling RTP package
 	unsigned int ssrc;
 	cricket::GetRtpSsrc(data, length, &ssrc);
@@ -119,7 +117,6 @@ void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, co
             }            
             buffer_->PushBuffer(data, length);
             convertMultipulNAL();
-
         } else {
             if ( buffer_->BufferSize() == 0) {
                 return;             // drop this rtp
@@ -145,7 +142,7 @@ void RtpSinker::convertSignalNAL() {
     nal[0] = 0x00;
     nal[1] = 0x00;
     nal[2] = 0x00;
-    nal[3] = 0x00;
+    nal[3] = 0x01;
     
     int len = length - kRTPHeaderSize + 4;
     SignalCodedPicture(this, nal, len, timeStamp);
@@ -153,6 +150,30 @@ void RtpSinker::convertSignalNAL() {
 }
 
 void RtpSinker::convertMultipulNAL() {
+    static unsigned char codedPicture[1024*1024];
+
+    unsigned char nalHeader = (buffer_->buffer_.front()->data[kRTPHeaderSize] & 0xE0) +
+                  (buffer_->buffer_.front()->data[kRTPHeaderSize+1] & 0x1F); 
+    unsigned int timeStamp;
+    cricket::GetRtpTimestamp(buffer_->buffer_.front()->data,  
+                             buffer_->buffer_.front()->length,  
+                             &timeStamp);
+    
+    unsigned int codedLength = 5;
+    codedPicture[0] = 0x00;
+    codedPicture[1] = 0x00;
+    codedPicture[2] = 0x00;
+    codedPicture[3] = 0x01;
+    codedPicture[4] = nalHeader;
+    
+    for( std::list<MediaPackage*>::iterator i = buffer_->buffer_.begin();
+            i != buffer_->buffer_.end(); i++) {
         
+        memcpy( &codedPicture[codedLength], &((*i)->data[kRTPHeaderSize+2]), (*i)->length - kRTPHeaderSize - 2);
+        codedLength += ((*i)->length - kRTPHeaderSize - 2);
+    }
+ 
+    SignalCodedPicture(this, codedPicture, codedLength, timeStamp);
+    buffer_->Reset();
 }
 
