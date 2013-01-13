@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simpleRTC", "simpleRTC.vcproj", "{C3F0715A-FA91-49F6-A1BC-E770823F13EB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjingle", "libjingle.vcproj", "{8EEB89CE-5D95-46A0-A5E7-034BEF82460F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{C3F0715A-FA91-49F6-A1BC-E770823F13EB}.Debug|Win32.Build.0 = Debug|Win32
 		{C3F0715A-FA91-49F6-A1BC-E770823F13EB}.Release|Win32.ActiveCfg = Release|Win32
 		{C3F0715A-FA91-49F6-A1BC-E770823F13EB}.Release|Win32.Build.0 = Release|Win32
+		{8EEB89CE-5D95-46A0-A5E7-034BEF82460F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8EEB89CE-5D95-46A0-A5E7-034BEF82460F}.Debug|Win32.Build.0 = Debug|Win32
+		{8EEB89CE-5D95-46A0-A5E7-034BEF82460F}.Release|Win32.ActiveCfg = Release|Win32
+		{8EEB89CE-5D95-46A0-A5E7-034BEF82460F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
