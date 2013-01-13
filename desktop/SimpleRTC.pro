@@ -11,9 +11,13 @@ CONFIG(debug, debug|release) {
     MOC_DIR = release/moc
 }
 
-INCLUDEPATH += $$ROOT_DIR
+FFMPEG_INC_DIR = /Users/teaonly/proj/media/ffmpeg-1.0.1
+FFMPEG_AVCODEC_LIBRARY = /Users/teaonly/proj/media/ffmpeg-1.0.1/libavcodec/libavcodec.a
+FFMPEG_AVUTIL_LIBRARY = /Users/teaonly/proj/media/ffmpeg-1.0.1/libavutil/libavutil.a
+
+INCLUDEPATH += $$ROOT_DIR $$FFMPEG_INC_DIR
 DEFINES = "HAMMER_TIME=1" "LOGGING=1" FEATURE_ENABLE_SSL "HASHNAMESPACE=__gnu_cxx" POSIX DISABLE_DYNAMIC_CAST "HAVE_OPENSSL_SSL_H=1" _REENTRANT OSX _DEBUG EXPAT_RELATIVE_PATH   
-LIBS += libjingle.a
+LIBS += libjingle.a $$FFMPEG_AVCODEC_LIBRARY $$FFMPEG_AVUTIL_LIBRARY
 
 SOURCES += \ 
     main_gui.cpp \
@@ -24,7 +28,8 @@ SOURCES += \
     datachannel.cpp \
     udpdatachannel.cpp \
     mediabuffer.cpp \
-    rtpsinker.cpp
+    rtpsinker.cpp \
+    ffdecoder.cpp
 
 HEADERS += \
     videowidget.h \
