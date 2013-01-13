@@ -4,13 +4,14 @@
 class VideoWidget;
 class QIODevice;
 class QAudioOutput;
+class VideoPicture;
 
 class EzRender {
 public:
     EzRender( VideoWidget* pWidget);
     virtual ~EzRender();
 
-    void ShowPicture();
+    void ShowPicture(VideoPicture *yuv);
 
 private:	
     VideoWidget *pWidget;	

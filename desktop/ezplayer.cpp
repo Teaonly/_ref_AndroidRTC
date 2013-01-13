@@ -37,11 +37,10 @@ void EzPlayer::OnMessage(talk_base::Message *msg) {
         if ( buffer_->PullBuffer() ) {
             MediaPackage* pkg = buffer_->Released();
             if ( decoder_->DecodeVideoPacket(pkg, picture_) ) {
-                std::cout << "new Picture is OK, need render!" << std::endl;
+                render_->ShowPicture(picture_);
             }
         }         
     }
 }
-
 
 
