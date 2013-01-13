@@ -29,7 +29,9 @@ SOURCES += \
     udpdatachannel.cpp \
     mediabuffer.cpp \
     rtpsinker.cpp \
-    ffdecoder.cpp
+    ffdecoder.cpp \
+    ezplayer.cpp \
+    ezrender.cpp
 
 HEADERS += \
     videowidget.h \
