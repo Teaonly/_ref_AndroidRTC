@@ -2,11 +2,14 @@
 #include <iostream>
 #include <assert.h>
 
+#include "mediabuffer.h"
 #include "talk/base/thread.h" 
 #include "talk/base/messagequeue.h"
 
 extern "C" {
-#include <libavcodec/avcodec.h>
+    struct AVCodec;
+    struct AVCodecContext;
+    struct AVFrame;
 };
 
 #include "ffdefine.h"
@@ -17,7 +20,7 @@ class FFDecoder {
 public:
     FFDecoder(AVCodecContext *pCC, AVCodec *pC);
     virtual ~FFDecoder();
-    virtual int DecodeVideoPacket(MediaPacket *, VideoPicture*);
+    virtual int DecodeVideoPacket(MediaPackage *, VideoPicture*);
     
     TeaCodecType type;
 private:

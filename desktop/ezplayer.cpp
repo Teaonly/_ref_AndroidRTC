@@ -1,3 +1,4 @@
+#include "ffdefine.h"
 #include "mediabuffer.h"
 #include "rtpsinker.h"
 #include "ezplayer.h"
@@ -15,6 +16,7 @@ EzPlayer::EzPlayer(EzRender* render, talk_base::Thread* decoding_thread)  {
     decoding_thread_ = decoding_thread;
 
     buffer_ = new MediaBuffer(32, kMaxPackageSize); 
+    picture_ = new VideoPicture();
     decoder_ = CreateH264Decoder();
 }   
 
@@ -34,7 +36,9 @@ void EzPlayer::OnMessage(talk_base::Message *msg) {
     if(msg->message_id == MSG_NEW_PACKAGE ) {
         if ( buffer_->PullBuffer() ) {
             MediaPackage* pkg = buffer_->Released();
-           
+            if ( decoder_->DecodeVideoPacket(pkg, picture_) ) {
+                std::cout << "new Picture is OK, need render!" << std::endl;
+            }
         }         
     }
 }

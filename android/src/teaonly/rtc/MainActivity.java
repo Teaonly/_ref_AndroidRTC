@@ -172,7 +172,7 @@ public class MainActivity extends Activity
             int wid = cameraView_.Width();
             int hei = cameraView_.Height();
             
-            String url = "udp://172.13.0.145:1979";
+            String url = "udp://172.13.0.50:1979";
             String media = "video:h.264:" + Integer.toString(wid) + ":" + Integer.toString(hei);
 
             if ( nativeStart(url, media) == 0) {

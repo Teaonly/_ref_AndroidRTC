@@ -23,25 +23,6 @@ typedef enum {
     TEACODEC_TYPE_AUDIO
 }TeaCodecType;
 
-class MediaPacket {
-public:
-    MediaPacket(unsigned int size) {
-        data = new unsigned char[size + 8 - (size%8) ];
-    }
-    ~MediaPacket(){
-        delete data;
-    }
-public:
-    MediaTime pts;
-    MediaTime dts;
-    int       duration;
-    unsigned int channel; 
-    unsigned char *data;
-    unsigned int size;
-    TeaCodecType type;
-    void *priv;
-};
-
 typedef enum {
     YUV_420_PLAN = 1,
     YUV_420_PACK = 2,

@@ -7,6 +7,7 @@
 #include "talk/base/criticalsection.h"
 
 class MediaBuffer;
+class VideoPicture;
 class EzRender;
 class FFDecoder;
 class RtpSinker;
@@ -26,6 +27,7 @@ private:
     talk_base::Thread* decoding_thread_; 
     
     MediaBuffer* buffer_;    
+    VideoPicture* picture_; 
     FFDecoder* decoder_;
 };
 

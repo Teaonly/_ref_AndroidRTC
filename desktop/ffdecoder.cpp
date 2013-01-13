@@ -1,3 +1,9 @@
+extern "C" {
+#include <config.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+};
+
 #include "ffdecoder.h"
 
 FFDecoder::FFDecoder(AVCodecContext *pCC, AVCodec *pC) {
@@ -20,21 +26,20 @@ FFDecoder::~FFDecoder(){
         av_free(pFrame);
 }
 
-int FFDecoder::DecodeVideoPacket(MediaPacket *pkt, VideoPicture* vp) {
+int FFDecoder::DecodeVideoPacket(MediaPackage *pkt, VideoPicture* vp) {
     if ( type != TEACODEC_TYPE_VIDEO)
         return 0;
     
     
-    //convert MediaPacket to FFMPEG's AVPacket
+    //convert MediaPakage to FFMPEG's AVPacket
     AVPacket ffpkt;
     ffpkt.data = pkt->data;
-    ffpkt.size = pkt->size;
-    ffpkt.pts = pkt->pts;
-    ffpkt.dts = pkt->dts;
+    ffpkt.size = pkt->length;
+    //ffpkt.pts = pkt->pts;
+    //ffpkt.dts = pkt->dts;
     
     int isFinished;
     avcodec_decode_video2(pCodecCtx, pFrame, &isFinished, &ffpkt);
-    delete pkt;
 
     if ( !isFinished ) 
         return 0;
@@ -64,9 +69,11 @@ int FFDecoder::DecodeVideoPacket(MediaPacket *pkt, VideoPicture* vp) {
 
 
 FFDecoder* CreateH264Decoder() {
+    avcodec_register_all();
     AVCodec *pC = avcodec_find_decoder(AV_CODEC_ID_H264);
     AVCodecContext *pCC = avcodec_alloc_context3(pC);
-    if ( pC != NULL && pCC != NULL) {
+    int ret = avcodec_open2(pCC, pC, NULL);
+    if ( ret >= 0) {
         return new FFDecoder(pCC, pC);
     }   
 

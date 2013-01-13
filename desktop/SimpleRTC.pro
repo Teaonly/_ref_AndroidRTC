@@ -14,10 +14,11 @@ CONFIG(debug, debug|release) {
 FFMPEG_INC_DIR = /Users/teaonly/proj/media/ffmpeg-1.0.1
 FFMPEG_AVCODEC_LIBRARY = /Users/teaonly/proj/media/ffmpeg-1.0.1/libavcodec/libavcodec.a
 FFMPEG_AVUTIL_LIBRARY = /Users/teaonly/proj/media/ffmpeg-1.0.1/libavutil/libavutil.a
+FFMPEG_AVFORMAT_LIBRARY = /Users/teaonly/proj/media/ffmpeg-1.0.1/libavformat/libavformat.a
 
 INCLUDEPATH += $$ROOT_DIR $$FFMPEG_INC_DIR
 DEFINES = "HAMMER_TIME=1" "LOGGING=1" FEATURE_ENABLE_SSL "HASHNAMESPACE=__gnu_cxx" POSIX DISABLE_DYNAMIC_CAST "HAVE_OPENSSL_SSL_H=1" _REENTRANT OSX _DEBUG EXPAT_RELATIVE_PATH   
-LIBS += libjingle.a $$FFMPEG_AVCODEC_LIBRARY $$FFMPEG_AVUTIL_LIBRARY
+LIBS += libjingle.a $$FFMPEG_AVCODEC_LIBRARY $$FFMPEG_AVUTIL_LIBRARY $$FFMPEG_AVFORMAT_LIBRARY -lz -framework VideoDecodeAcceleration -framework CoreVideo
 
 SOURCES += \ 
     main_gui.cpp \

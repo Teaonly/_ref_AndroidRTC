@@ -93,7 +93,6 @@ void RtpSinker::OnChannelClosed(DataChannel *ch) {
 
 void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, const unsigned int& length, bool& isValid) {
     
-    printf("OnChannelDataRead = %d\n", length);
     // handling RTP package
 	unsigned int ssrc;
 	cricket::GetRtpSsrc(data, length, &ssrc);
@@ -102,7 +101,6 @@ void RtpSinker::OnChannelDataRead(DataChannel *ch, const unsigned char* data, co
         return;
 	}
     isValid = true;
-    printf("OnChannelDataRead SSRC =  %x\n", ssrc);
 
     unsigned char payloadType = data[kRTPHeaderSize] & 0x1F;
     unsigned char nalFlag = data[kRTPHeaderSize+1] & 0xE0;
