@@ -26,3 +26,7 @@ void VideoDialog::closeEvent(QCloseEvent *event) {
     event->accept();
 }
 
+VideoWidget* VideoDialog::GetVideoWidget() {
+    return ui->video;
+}
+

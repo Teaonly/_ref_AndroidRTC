@@ -5,6 +5,8 @@
 #include "talk/base/thread.h"
 #include "rtpsinker.h"
 #include "videodialog.h"
+#include "ezplayer.h"
+#include "ezrender.h"
 
 class SinkerReceiver: public sigslot::has_slots<> {
 public:    
@@ -25,10 +27,12 @@ public:
 int main(int argc, char *argv[]) {
     talk_base::Thread *streaming_thread = new talk_base::Thread();
     streaming_thread->Start();
+ 
+    talk_base::Thread *decoding_thread = new talk_base::Thread();
+    decoding_thread->Start();
     
     RtpSinker *sinker = new RtpSinker(streaming_thread);
     SinkerReceiver *receiver = new SinkerReceiver();
-
     sinker->SignalCodedPicture.connect(receiver, &SinkerReceiver::OnCodedPicture);
 
     std::string localAddr = "udp://127.0.0.1:1979";
@@ -36,9 +40,14 @@ int main(int argc, char *argv[]) {
     sinker->StartSinking(localAddr, description, 0x19791010);
     
     QApplication app(argc, argv);
-
     VideoDialog vDialog(&app);
-    vDialog.show();
+    
+    EzRender* render = new EzRender(vDialog.GetVideoWidget());
+    EzPlayer* player = new EzPlayer(render, decoding_thread);
+    sinker->SignalCodedPicture.connect(player, &EzPlayer::OnCodedPicture);
 
+    vDialog.show();
     return app.exec();
+   
+    //delete objects
 }
