@@ -32,6 +32,9 @@ int H264Encoder::Prepare(const MediaDescription& desc) {
 
     // 0. building a default encoder parameters. 
     x264_param_default_preset(&x264_opt_, "ultrafast", "zerolatency");
+    x264_opt_.rc.i_rc_method = X264_RC_CRF;
+    x264_opt_.rc.i_bitrate = 512;
+    x264_opt_.i_nal_hrd = X264_NAL_HRD_CBR; 
     //x264_param_default(&opt);
     
     // 1. Setting the fields of parameter struct
@@ -92,9 +95,19 @@ int H264Encoder::EncodePicture(unsigned char *yuv) {
 }
 
 void H264Encoder::doEncoding() {
+    static int count = 0;
     // encoding current picture 
     int nals;
     x264_nal_t *nal_pointer;
+    
+    /*
+    if ( count % 100) {
+        x264_picin_[ppIndex].i_type = X264_TYPE_IDR;
+    } else {
+        x264_picin_[ppIndex].i_type = X264_TYPE_AUTO;
+    }
+    */
+    
     x264_encoder_encode(x264_hdl_, &nal_pointer, &nals, &x264_picin_[ppIndex], &x264_picout_);    
     
     // fetching the current data
@@ -104,6 +117,7 @@ void H264Encoder::doEncoding() {
     }  
     
     ppIndex = 1 - ppIndex;
+    count ++;
 }
 
 
