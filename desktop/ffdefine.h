@@ -1,6 +1,8 @@
 #ifndef _BASE_H_
 #define _BASE_H_
 
+#include <stdlib.h>
+
 #ifdef POSIX 
 #include <stdint.h>
 #include <sys/time.h>
@@ -49,7 +51,7 @@ public:
     unsigned int height;
     unsigned char *vplan[3];
     unsigned int vplan_length[3];
-    MediaTime   mt;    
+    //MediaTime   mt;    
 };
 
 #endif

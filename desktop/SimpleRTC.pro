@@ -19,25 +19,27 @@ mac {
 }
 
 win32 {
-    FFMPEG_INC_DIR = "C:\workspace\Media\ffmpeg-dev\include"
-    FFMPEG_AVCODEC_LIBRARY = "C:\workspace\Media\ffmpeg-dev\lib\libavcodec.lib"
-    FFMPEG_AVUTIL_LIBRARY = "C:\workspace\Media\ffmpeg-dev\lib\libavutil.lib"
-    FFMPEG_AVFORMAT_LIBRARY = "C:\workspace\Media\ffmpeg-dev\lib\libavformat.lib"    
+    FFMPEG_INC_DIR = "C:\\workspace\\projects\\media\\ffmpeg-dev\\include"
+    FFMPEG_AVCODEC_LIBRARY = "C:\\workspace\\projects\\media\\ffmpeg-dev\\lib\\avcodec.lib"
+    FFMPEG_AVUTIL_LIBRARY = "C:\\workspace\\projects\\media\\ffmpeg-dev\\lib\\avutil.lib"
+    FFMPEG_AVFORMAT_LIBRARY = "C:\\workspace\\projects\\media\\ffmpeg-dev\\lib\\avformat.lib"    
 }
 
 
 INCLUDEPATH += $$ROOT_DIR $$FFMPEG_INC_DIR
-DEFINES = "HAMMER_TIME=1" "LOGGING=1" FEATURE_ENABLE_SSL "HASHNAMESPACE=__gnu_cxx" POSIX DISABLE_DYNAMIC_CAST "HAVE_OPENSSL_SSL_H=1" _REENTRANT OSX _DEBUG EXPAT_RELATIVE_PATH
+DEFINES = "HAMMER_TIME=1" "LOGGING=1" FEATURE_ENABLE_SSL "HASHNAMESPACE=__gnu_cxx" DISABLE_DYNAMIC_CAST "HAVE_OPENSSL_SSL_H=1" _REENTRANT _DEBUG EXPAT_RELATIVE_PATH
+
 mac {   
     LIBS += libjingle.a $$FFMPEG_AVCODEC_LIBRARY $$FFMPEG_AVUTIL_LIBRARY $$FFMPEG_AVFORMAT_LIBRARY -lz -framework VideoDecodeAcceleration -framework CoreVideo
+    DEFINES += POSIX OSX
 }
 
-unix {
-    LIBS += libjingle.a $$FFMPEG_AVCODEC_LIBRARY $$FFMPEG_AVUTIL_LIBRARY $$FFMPEG_AVFORMAT_LIBRARY -lz
-}
 
 win32 {
-    LIBS += ".\libjingle.lib"
+    INCLUDEPATH += "C:\\workspace\\projects\\AndroidRTC\\desktop\\win" 
+    LIBS += "C:\\workspace\\projects\\AndroidRTC\\desktop\\win\\Debug\\libjingle.lib" 
+    LIBS += $$FFMPEG_AVCODEC_LIBRARY $$FFMPEG_AVUTIL_LIBRARY $$FFMPEG_AVFORMAT_LIBRARY    
+    DEFINES += WIN32 _WINDOWS 
 }
 
 SOURCES += \ 

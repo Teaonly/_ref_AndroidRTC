@@ -1,5 +1,4 @@
 extern "C" {
-#include <config.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 };
