@@ -35,8 +35,6 @@ mac {
 
 win32 {
     INCLUDEPATH += "C:\\workspace\\projects\\AndroidRTC\\desktop\\win" 
-    LIBS += "C:\\workspace\\projects\\AndroidRTC\\desktop\\win\\Debug\\libjingle.lib" 
-    LIBS += $$FFMPEG_AVCODEC_LIBRARY $$FFMPEG_AVUTIL_LIBRARY $$FFMPEG_AVFORMAT_LIBRARY    
     LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/shell32.lib)
     LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/ws2_32.lib)
     LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/crypt32.lib)
@@ -44,6 +42,8 @@ win32 {
     LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/secur32.lib)
     LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/wininet.lib)
     LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/advapi32.lib)
+    LIBS += "C:\\workspace\\projects\\AndroidRTC\\desktop\\win\\Debug\\libjingle.lib" 
+    LIBS += $$FFMPEG_AVCODEC_LIBRARY  $$FFMPEG_AVUTIL_LIBRARY
     DEFINES += WIN32 _WINDOWS 
 }
 
