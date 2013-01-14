@@ -25,7 +25,6 @@ win32 {
     FFMPEG_AVFORMAT_LIBRARY = "C:\\workspace\\projects\\media\\ffmpeg-dev\\lib\\avformat.lib"    
 }
 
-
 INCLUDEPATH += $$ROOT_DIR $$FFMPEG_INC_DIR
 DEFINES = "HAMMER_TIME=1" "LOGGING=1" FEATURE_ENABLE_SSL "HASHNAMESPACE=__gnu_cxx" DISABLE_DYNAMIC_CAST "HAVE_OPENSSL_SSL_H=1" _REENTRANT _DEBUG EXPAT_RELATIVE_PATH
 
@@ -34,11 +33,17 @@ mac {
     DEFINES += POSIX OSX
 }
 
-
 win32 {
     INCLUDEPATH += "C:\\workspace\\projects\\AndroidRTC\\desktop\\win" 
     LIBS += "C:\\workspace\\projects\\AndroidRTC\\desktop\\win\\Debug\\libjingle.lib" 
     LIBS += $$FFMPEG_AVCODEC_LIBRARY $$FFMPEG_AVUTIL_LIBRARY $$FFMPEG_AVFORMAT_LIBRARY    
+    LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/shell32.lib)
+    LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/ws2_32.lib)
+    LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/crypt32.lib)
+    LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/iphlpapi.lib)
+    LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/secur32.lib)
+    LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/wininet.lib)
+    LIBS += $$quote(C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib/advapi32.lib)
     DEFINES += WIN32 _WINDOWS 
 }
 
